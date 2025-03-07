@@ -169,6 +169,16 @@ function App() {
     { size: 180, x: '15%', y: '75%', delay: 0.9 },
   ];
 
+  const imgs = [
+    "/img/annh1.jpg",
+    "/img/annh2.jpg",
+    "/img/annh3.jg",
+    "/img/annh4.jpg",
+    "/img/annh15.jpg",
+    "/img/annh16.jpg",
+    "/img/annh1.7jpg",
+  ]
+
   useEffect(() => {
     if (modelViewerRef.current) {
       // Any model-viewer specific setup
@@ -205,7 +215,7 @@ function App() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        Chúc mừng ngày 8/3, cún iu cụa anhhh!
+        Chúc mừng ngày 8/3, Hoàng Mỹ xinh yêu cụa anhhh !!!
       </Title>
       
       <PuppyContainer

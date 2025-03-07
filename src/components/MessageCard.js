@@ -181,12 +181,15 @@ const CustomHeart = ({ color }) => (
 );
 
 const messages = [
-    "Gửi đến người phụ nữ tuyệt vời nhất trong cuộc đời anh, em mang đến niềm vui và hạnh phúc cho mỗi ngày.",
-    "Nụ cười của em thắp sáng thế giới của anh, và tình yêu của em lấp đầy trái tim anh bằng sự ấm áp.",
-    "Vào ngày đặc biệt này, anh muốn em biết em có ý nghĩa như thế nào đối với anh.",
-    "Em không chỉ là bạn gái của anh, em là bạn thân nhất của anh, là người bạn tâm giao và là tất cả của anh.",
+    "Gửi eim người tuyệt vời nhất trong cuộc đời anh, eim mang đến cho anh niềm hạnh phúc mỗi ngày.",
+    "Nụ cười của em như thắp sáng thế giới của anh, và tình yêu của em lấp đầy trái tim anh bằng sự ấm áp.",
+    "Vào ngày đặc biệt này, anh muốn cho eim biết rằng eim có ý nghĩa như thế nào đối với anh.",
+    "Rằng, eim là tất cả cụa anh, em luôn nằm trong tâm trí và trái tim anh.",
+    "Hãy bên cạnh anh như bây giờ, eim yêu nhé!",
     "Anh trân trọng từng khoảnh khắc chúng ta bên nhau, và anh mong muốn tạo ra nhiều kỷ niệm đẹp hơn nữa.",
-    "Chúc mừng Ngày Phụ nữ, tình yêu của anh! Em xứng đáng có được tất cả hạnh phúc trên thế giới này."
+    "Chúc mừng Ngày Phụ nữ Việt Nam!",
+    "Chúc eim luôn vui vẻ, hạnh phúc và làm dược những gì mình mong muốn.",
+    "Chúc cho tình yêu của anh với em vẫn vậy❤️"
 ];
 
 // Then update the MessageCard component to accept and pass the prop:
@@ -345,7 +348,7 @@ const MessageCard = ({ marginBottom }) => {
                         whileHover={{ scale: 1.05, boxShadow: '0 6px 20px rgba(255, 105, 180, 0.6)' }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        {currentMessage === messages.length - 1 ? 'Finish' : 'Next Message'}
+                        {currentMessage === messages.length - 1 ? 'Xem tiếp?' : 'Tiếp tục'}
                         <HeartIcon
                             animate={{
                                 scale: [1, 1.3, 1],
@@ -415,7 +418,7 @@ const MessageCard = ({ marginBottom }) => {
                                 repeatType: "reverse"
                             }}
                         >
-                            I Love You
+                            Anh yêu em rất nhiều!
                         </motion.div>
                     </FinalMessage>
                 </FullscreenOverlay>
