@@ -8,7 +8,7 @@ const CardContainer = styled(motion.div)`
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   border-radius: 24px;
-  padding: 35px;
+  padding: 30px;
   max-width: 550px;
   width: 90%;
   box-shadow: 
@@ -60,8 +60,8 @@ const MessageWrapper = styled(motion.div)`
 `;
 
 const Message = styled(motion.p)`
-  font-size: 1.3rem;
-  line-height: 1.7;
+  font-size: 1.0rem;
+  line-height: 1.5;
   color: #333;
   margin-bottom: 25px;
   font-family: 'Comic Sans MS', 'Bubblegum Sans', 'Indie Flower', cursive;
