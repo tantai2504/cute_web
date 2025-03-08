@@ -218,6 +218,24 @@ function App() {
     }
   }, [assetsLoaded, totalAssets]);
 
+  // Function to scroll to bottom of page
+  const scrollToBottom = () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+  // Add a new useEffect to scroll to bottom once loading is complete
+  useEffect(() => {
+    if (!isLoading) {
+      // Add a small delay to ensure all components are rendered
+      setTimeout(() => {
+        scrollToBottom();
+      }, 500);
+    }
+  }, [isLoading]);
+
   return (
     <>
       <AnimatePresence>

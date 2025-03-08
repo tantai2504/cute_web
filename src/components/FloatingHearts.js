@@ -162,7 +162,7 @@ const FloatingHearts = ({ count = 15, images = [] }) => {
   // Generate floating images once with useMemo
   const floatingImages = useMemo(() => {
     return images.map((src, i) => {
-      const size = Math.random() * 20 + 50;
+      const size = Math.random() * 20 + 30;
       // More centered distribution
       const left = Math.random() * 60 + 20;
       const duration = Math.random() * 15 + 15;
@@ -203,7 +203,7 @@ const FloatingHearts = ({ count = 15, images = [] }) => {
                   cursor: "pointer",
                 }}
               >
-                Close
+                Đóng
               </button>
             </div>
           </Popup>
