@@ -1,9 +1,38 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import styled from "styled-components";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import MessageCard from "./components/MessageCard";
 import FloatingHearts from "./components/FloatingHearts";
 import "./App.css";
+
+// Add a loading state to manage initial rendering
+const LoadingOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const LoadingSpinner = styled.div`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 105, 180, 0.1);
+  border-top-color: #ff69b4;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
 
 const AppContainer = styled.div`
   width: 100%;
@@ -24,6 +53,7 @@ const DecorationCircle = styled(motion.div)`
   background: radial-gradient(circle, rgba(255, 105, 180, 0.3) 0%, rgba(255, 105, 180, 0) 70%);
   filter: blur(8px);
   z-index: 1;
+  will-change: opacity;
 `;
 
 const StarContainer = styled.div`
@@ -44,6 +74,7 @@ const Star = styled.div`
   border-radius: 50%;
   opacity: ${(props) => props.opacity};
   animation: twinkle ${(props) => props.duration}s ease-in-out infinite;
+  will-change: opacity, transform;
 
   @keyframes twinkle {
     0%,
@@ -71,6 +102,7 @@ const Title = styled(motion.h1)`
   padding: 0 15px;
   width: 100%;
   max-width: 90vw;
+  will-change: opacity, transform;
 
   @media (max-width: 768px) {
     font-size: clamp(1.5rem, 4vw, 2rem);
@@ -83,11 +115,6 @@ const Title = styled(motion.h1)`
   }
 `;
 
-// Then in your JSX:
-<Title initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="responsive-title">
-  Chúc mừng ngày 8/3, cún iu cụa anhhh!
-</Title>;
-
 const PuppyContainer = styled(motion.div)`
   width: 100%;
   height: 50vh;
@@ -97,6 +124,7 @@ const PuppyContainer = styled(motion.div)`
   z-index: 5;
   margin-bottom: 20px;
   position: relative;
+  will-change: opacity, transform;
 
   &:after {
     content: "";
@@ -112,128 +140,145 @@ const PuppyContainer = styled(motion.div)`
   }
 `;
 
-// Decorative frame around the puppy
-// const PuppyFrame = styled.div`
-//   position: absolute;
-//   width: 80%;
-//   height: 90%;
-//   border: 2px dashed rgba(255, 105, 180, 0.3);
-//   border-radius: 20px;
-//   z-index: 4;
-//   pointer-events: none;
-
-//   &:before, &:after {
-//     content: '';
-//     position: absolute;
-//     width: 20px;
-//     height: 20px;
-//     border-radius: 50%;
-//     background-color: rgba(255, 105, 180, 0.5);
-//   }
-
-//   &:before {
-//     top: -10px;
-//     left: -10px;
-//   }
-
-//   &:after {
-//     bottom: -10px;
-//     right: -10px;
-//   }
-// `;
-
 function App() {
   const modelViewerRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [assetsLoaded, setAssetsLoaded] = useState(0);
+  const [totalAssets, setTotalAssets] = useState(1); // Start with 1 for the model
 
-  const stars = Array.from({ length: 50 }).map((_, i) => {
-    const size = Math.random() * 3 + 1;
-    const opacity = Math.random() * 0.5 + 0.3;
-    const top = Math.random() * 100;
-    const left = Math.random() * 100;
-    const duration = Math.random() * 3 + 2;
+  // Generate stars once
+  const stars = useMemo(() => {
+    return Array.from({ length: 30 }).map((_, i) => {
+      // Reduced count for better performance
+      const size = Math.random() * 3 + 1;
+      const opacity = Math.random() * 0.5 + 0.3;
+      const top = Math.random() * 100;
+      const left = Math.random() * 100;
+      const duration = Math.random() * 3 + 2;
 
-    return <Star key={i} size={size} opacity={opacity} duration={duration} style={{ top: `${top}%`, left: `${left}%` }} />;
-  });
-
-  // Decorative circles
-  const circles = [
-    { size: 300, x: "10%", y: "20%", delay: 0 },
-    { size: 200, x: "85%", y: "15%", delay: 0.3 },
-    { size: 250, x: "75%", y: "80%", delay: 0.6 },
-    { size: 180, x: "15%", y: "75%", delay: 0.9 },
-  ];
-
-  const imgs = [
-    "/img/anh1.jpg",
-    "/img/anh2.jpg",
-    "/img/anh3.jg",
-    "/img/anh4.jpg",
-    "/img/anh5.jpg",
-    "/img/anh6.jpg",
-    "/img/anh7.jpg",
-    "/img/anh8.jpg",
-    "/img/anh9.jpg",
-    "/img/anh10.jpg",
-    "/img/anh11.jpg",
-    "/img/anh12.jpg",
-    "/img/anh13.jpg",
-  ];
-
-  useEffect(() => {
-    if (modelViewerRef.current) {
-      // Any model-viewer specific setup
-    }
+      return <Star key={i} size={size} opacity={opacity} duration={duration} style={{ top: `${top}%`, left: `${left}%` }} />;
+    });
   }, []);
 
+  // Decorative circles
+  const circles = useMemo(
+    () => [
+      { size: 300, x: "10%", y: "20%", delay: 0.2 },
+      { size: 200, x: "85%", y: "15%", delay: 0.4 },
+      { size: 250, x: "75%", y: "80%", delay: 0.6 },
+      { size: 180, x: "15%", y: "75%", delay: 0.8 },
+    ],
+    []
+  );
+
+  const imgs = useMemo(() => ["/img/anh1.jpg", "/img/anh2.jpg", "/img/anh3.jpg", "/img/anh4.jpg", "/img/anh5.jpg", "/img/anh6.jpg", "/img/anh7.jpg", "/img/anh8.jpg"], []); // Reduced number of images
+
+  useEffect(() => {
+    // Preload 3D model
+    if (window.document) {
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js";
+      script.type = "module";
+      document.head.appendChild(script);
+
+      script.onload = () => {
+        setAssetsLoaded((prev) => prev + 1);
+      };
+
+      // Preload images
+      setTotalAssets(1 + imgs.length); // Model + images
+
+      imgs.forEach((imgSrc) => {
+        const img = new Image();
+        img.src = imgSrc;
+        img.onload = () => {
+          setAssetsLoaded((prev) => prev + 1);
+        };
+        img.onerror = () => {
+          setAssetsLoaded((prev) => prev + 1); // Count errors as loaded to avoid hanging
+        };
+      });
+    }
+
+    // Finish loading after max 3 seconds regardless of asset loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [imgs]);
+
+  // Check if all assets are loaded
+  useEffect(() => {
+    if (assetsLoaded >= totalAssets) {
+      // Give a slight delay for smoother transition
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+    }
+  }, [assetsLoaded, totalAssets]);
+
   return (
-    <AppContainer>
-      {/* Background stars */}
-      <StarContainer>{stars}</StarContainer>
+    <>
+      <AnimatePresence>
+        {isLoading && (
+          <LoadingOverlay initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+            <LoadingSpinner />
+          </LoadingOverlay>
+        )}
+      </AnimatePresence>
 
-      {/* Decorative circles */}
-      {circles.map((circle, index) => (
-        <DecorationCircle
-          key={index}
-          style={{
-            width: circle.size,
-            height: circle.size,
-            left: circle.x,
-            top: circle.y,
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.6 }}
-          transition={{ delay: circle.delay, duration: 1 }}
-        />
-      ))}
+      <AppContainer>
+        {/* Background stars */}
+        <StarContainer>{stars}</StarContainer>
 
-      <FloatingHearts count={20} images={imgs} />
+        {/* Decorative circles with staggered animations */}
+        {circles.map((circle, index) => (
+          <DecorationCircle
+            key={index}
+            style={{
+              width: circle.size,
+              height: circle.size,
+              left: circle.x,
+              top: circle.y,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.6 }}
+            transition={{ delay: circle.delay, duration: 1.2 }}
+          />
+        ))}
 
-      <Title initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
-        Chúc mừng ngày 8/3, Hoàng Mỹ xinh yêu cụa anhhh !!!
-      </Title>
+        {/* Reduce count for better performance */}
+        <FloatingHearts count={10} images={imgs} />
 
-      <PuppyContainer initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.5 }}>
-        {/* <PuppyFrame /> */}
-        <model-viewer
-          ref={modelViewerRef}
-          src="/toon_cute_dog.glb"
-          alt="A cute cartoon dog"
-          auto-rotate
-          camera-controls
-          camera-orbit="0deg 10deg 2m"
-          min-camera-orbit="auto auto auto"
-          max-camera-orbit="auto auto auto"
-          shadow-intensity="1"
-          environment-image="neutral"
-          exposure="1"
-          ar
-          ar-modes="webxr scene-viewer quick-look"
-          style={{ width: "100%", height: "90%" }}
-        ></model-viewer>
-      </PuppyContainer>
+        <Title initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
+          Chúc mừng ngày 8/3, Hoàng Mỹ xinh yêu cụa anhhh !!!
+        </Title>
 
-      <MessageCard marginBottom={true} />
-    </AppContainer>
+        <PuppyContainer initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}>
+          <model-viewer
+            ref={modelViewerRef}
+            src="/toon_cute_dog.glb"
+            alt="A cute cartoon dog"
+            auto-rotate
+            camera-controls
+            camera-orbit="0deg 10deg 2m"
+            min-camera-orbit="auto auto auto"
+            max-camera-orbit="auto auto auto"
+            shadow-intensity="1"
+            environment-image="neutral"
+            exposure="1"
+            loading="eager"
+            reveal="auto"
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            style={{ width: "100%", height: "90%" }}
+          ></model-viewer>
+        </PuppyContainer>
+
+        <MessageCard marginBottom={true} />
+      </AppContainer>
+    </>
   );
 }
 
